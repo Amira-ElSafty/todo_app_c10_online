@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "766694323826",
+    "project_id": "todo-app-c10-online",
+    "storage_bucket": "todo-app-c10-online.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:766694323826:android:fee22c9c81c3cbbf87b4eb",
+        "android_client_info": {
+          "package_name": "com.example.flutter_app_todo_c10_online"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoCgkklTlhnFihxgZInIr-6I3MbcjqLi0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
