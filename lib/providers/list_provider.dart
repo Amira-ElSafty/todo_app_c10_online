@@ -6,8 +6,6 @@ import 'package:flutter_app_todo_c10_online/model/task.dart';
 class ListProvider extends ChangeNotifier {
   /// data
   List<Task> tasksList = [];
-
-  /// 16
   DateTime selectedDate = DateTime.now();
 
   void getAllTasksFromFireStore() async {
@@ -21,7 +19,6 @@ class ListProvider extends ChangeNotifier {
 
     /// filter all tasks
     /// select date => date time
-    /// 17/2/2024 =>
     tasksList = tasksList.where((task) {
       if (selectedDate.day == task.dateTime?.day &&
           selectedDate.month == task.dateTime?.month &&
@@ -41,9 +38,6 @@ class ListProvider extends ChangeNotifier {
 
   void changeSelectedDate(DateTime newSelectDate) {
     selectedDate = newSelectDate;
-
-    /// change select date
-    /// get all task
     getAllTasksFromFireStore();
   }
 }

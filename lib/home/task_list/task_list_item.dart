@@ -45,7 +45,7 @@ class TaskListItem extends StatelessWidget {
           padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(25),
-          ),
+            color: MyTheme.whiteColor),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

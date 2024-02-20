@@ -12,7 +12,6 @@ class TaskListTab extends StatelessWidget {
     if (listProvider.tasksList.isEmpty) {
       listProvider.getAllTasksFromFireStore();
     }
-    print('after calling get all tasks');
     return Column(
       children: [
         CalendarTimeline(
