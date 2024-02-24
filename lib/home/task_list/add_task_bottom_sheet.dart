@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_todo_c10_online/diaolg_utils.dart';
 import 'package:flutter_app_todo_c10_online/firebase_utils.dart';
 import 'package:flutter_app_todo_c10_online/model/task.dart';
 import 'package:flutter_app_todo_c10_online/my_theme.dart';
+import 'package:flutter_app_todo_c10_online/providers/auth_provider.dart';
 import 'package:flutter_app_todo_c10_online/providers/list_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -84,10 +86,10 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                       },
                       child: Text(
                         '${selectedDate.day}/${selectedDate.month}/'
-                            '${selectedDate.year}',
+                        '${selectedDate.year}',
                         style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                          fontWeight: FontWeight.w400,
-                        ),
+                              fontWeight: FontWeight.w400,
+                            ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -125,14 +127,30 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   void addTask() {
     if (formKey.currentState?.validate() == true) {
       /// add task
+      DialogUtils.showLoading(context: context, message: 'Loading');
       Task task =
           Task(title: title, description: description, dateTime: selectedDate);
-      FirebaseUtils.addTaskToFireStore(task)
-          .timeout(Duration(milliseconds: 500), onTimeout: () {
+      var authProvider = Provider.of<AuthProviders>(context, listen: false);
+      FirebaseUtils.addTaskToFireStore(task, authProvider.currentUser!.id!)
+          .then((value) {
         print('task added successfully');
+        Navigator.pop(context);
+        // Navigator.pop(context);
+        DialogUtils.hideLoading(context);
+        DialogUtils.showMessage(
+          context: context,
+          message: 'Task added Successfully',
+        );
 
         /// refresh task
-        listProvider.getAllTasksFromFireStore();
+        listProvider.getAllTasksFromFireStore(authProvider.currentUser!.id!);
+      }).timeout(Duration(milliseconds: 500), onTimeout: () {
+        print('task added successfully');
+        DialogUtils.showMessage(
+            context: context, message: 'Task added Successfully');
+
+        /// refresh task
+        listProvider.getAllTasksFromFireStore(authProvider.currentUser!.id!);
         Navigator.pop(context);
       });
     }

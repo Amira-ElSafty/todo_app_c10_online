@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_todo_c10_online/diaolg_utils.dart';
 import 'package:flutter_app_todo_c10_online/firebase_utils.dart';
 import 'package:flutter_app_todo_c10_online/model/task.dart';
 import 'package:flutter_app_todo_c10_online/my_theme.dart';
+import 'package:flutter_app_todo_c10_online/providers/auth_provider.dart';
 import 'package:flutter_app_todo_c10_online/providers/list_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +16,7 @@ class TaskListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var listProvider = Provider.of<ListProvider>(context);
+    var authProvider = Provider.of<AuthProviders>(context, listen: false);
     return Container(
       margin: EdgeInsets.all(10),
       child: Slidable(
@@ -28,10 +31,20 @@ class TaskListItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
               onPressed: (context) {
                 /// delete task
-                FirebaseUtils.deleteTaskFromFireStore(task)
-                    .timeout(Duration(milliseconds: 500), onTimeout: () {
+                FirebaseUtils.deleteTaskFromFireStore(
+                        task, authProvider.currentUser!.id!)
+                    .then((value) {
                   print('task deleted succussfully');
-                  listProvider.getAllTasksFromFireStore();
+                  DialogUtils.showMessage(
+                      context: context,
+                      message: 'Task deleted Successfully',
+                      posActionName: 'Ok');
+                  listProvider
+                      .getAllTasksFromFireStore(authProvider.currentUser!.id!);
+                }).timeout(Duration(milliseconds: 500), onTimeout: () {
+                  print('task deleted succussfully');
+                  listProvider
+                      .getAllTasksFromFireStore(authProvider.currentUser!.id!);
                 });
               },
               backgroundColor: MyTheme.redColor,

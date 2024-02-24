@@ -1,10 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_todo_c10_online/auth/custom_text_form_field.dart';
-import 'package:flutter_app_todo_c10_online/auth/login/login_screen.dart';
 import 'package:flutter_app_todo_c10_online/diaolg_utils.dart';
+import 'package:flutter_app_todo_c10_online/firebase_utils.dart';
 import 'package:flutter_app_todo_c10_online/home/home_screen.dart';
+import 'package:flutter_app_todo_c10_online/model/my_user.dart';
 import 'package:flutter_app_todo_c10_online/my_theme.dart';
+import 'package:flutter_app_todo_c10_online/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const String routeName = 'register_screen';
@@ -65,7 +68,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           label: 'User Name',
                           controller: nameController,
                           validator: (text) {
-                            if (text == null || text.isEmpty) {
+                            if (text == null || text.trim().isEmpty) {
                               return 'Please enter user Name';
                             }
                             return null;
@@ -76,7 +79,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           keyboardType: TextInputType.emailAddress,
                           controller: emailController,
                           validator: (text) {
-                            if (text == null || text.isEmpty) {
+                            if (text == null || text.trim().isEmpty) {
                               return 'Please enter email';
                             }
                             bool emailValid = RegExp(
@@ -92,8 +95,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           label: 'Password',
                           keyboardType: TextInputType.number,
                           controller: passwordController,
+                          obscureText: true,
                           validator: (text) {
-                            if (text == null || text.isEmpty) {
+                            if (text == null || text.trim().isEmpty) {
                               return 'Please enter Password';
                             }
                             if (text.length < 6) {
@@ -106,8 +110,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           label: 'Confirm Password',
                           keyboardType: TextInputType.number,
                           controller: confirmPasswordController,
+                          obscureText: true,
                           validator: (text) {
-                            if (text == null || text.isEmpty) {
+                            if (text == null || text.trim().isEmpty) {
                               return 'Please enter Confirm Password';
                             }
                             if (text != passwordController.text) {
@@ -127,12 +132,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 style: Theme.of(context).textTheme.titleLarge,
                               )),
                         ),
-                        TextButton(
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                  context, LoginScreen.routeName);
-                            },
-                            child: Text('Already have an account'))
                       ],
                     ))
               ],
@@ -154,6 +153,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           email: emailController.text,
           password: passwordController.text,
         );
+        MyUser myUser = MyUser(
+            id: credential.user?.uid ?? '',
+            name: nameController.text,
+            email: emailController.text);
+        var authProvider = Provider.of<AuthProviders>(context, listen: false);
+        authProvider.updateUser(myUser);
+        await FirebaseUtils.addUserToFireStore(myUser);
         // todo: hide loading
         DialogUtils.hideLoading(context);
         // todo: show message
@@ -163,7 +169,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             title: 'Success',
             posActionName: 'OK',
             posAction: () {
-              Navigator.pushNamed(context, HomeScreen.routeName);
+              Navigator.pushReplacementNamed(context, HomeScreen.routeName);
             });
         print('register scuccessfully');
         print(credential.user?.uid ?? "");

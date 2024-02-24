@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_todo_c10_online/auth/custom_text_form_field.dart';
 import 'package:flutter_app_todo_c10_online/auth/register/register_screen.dart';
 import 'package:flutter_app_todo_c10_online/diaolg_utils.dart';
+import 'package:flutter_app_todo_c10_online/firebase_utils.dart';
 import 'package:flutter_app_todo_c10_online/home/home_screen.dart';
 import 'package:flutter_app_todo_c10_online/my_theme.dart';
+import 'package:flutter_app_todo_c10_online/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String routeName = 'login_screen';
@@ -71,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           keyboardType: TextInputType.emailAddress,
                           controller: emailController,
                           validator: (text) {
-                            if (text == null || text.isEmpty) {
+                            if (text == null || text.trim().isEmpty) {
                               return 'Please enter email';
                             }
                             bool emailValid = RegExp(
@@ -87,8 +90,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           label: 'Password',
                           keyboardType: TextInputType.number,
                           controller: passwordController,
+                          obscureText: true,
                           validator: (text) {
-                            if (text == null || text.isEmpty) {
+                            if (text == null || text.trim().isEmpty) {
                               return 'Please enter Password';
                             }
                             if (text.length < 6) {
@@ -133,6 +137,13 @@ class _LoginScreenState extends State<LoginScreen> {
         final credential = await FirebaseAuth.instance
             .signInWithEmailAndPassword(
                 email: emailController.text, password: passwordController.text);
+        var user = await FirebaseUtils.readUserFromFireStore(
+            credential.user?.uid ?? "");
+        if (user == null) {
+          return;
+        }
+        var authProvider = Provider.of<AuthProviders>(context, listen: false);
+        authProvider.updateUser(user);
         // todo: hide loading
         DialogUtils.hideLoading(context);
         // todo: show message
@@ -142,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
             title: 'Success',
             posActionName: 'OK',
             posAction: () {
-              Navigator.pushNamed(context, HomeScreen.routeName);
+              Navigator.pushReplacementNamed(context, HomeScreen.routeName);
             });
         print('login successfully');
         print(credential.user?.uid ?? "");

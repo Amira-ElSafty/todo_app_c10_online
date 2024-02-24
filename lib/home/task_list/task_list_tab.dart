@@ -2,6 +2,7 @@ import 'package:calendar_timeline/calendar_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_todo_c10_online/home/task_list/task_list_item.dart';
 import 'package:flutter_app_todo_c10_online/my_theme.dart';
+import 'package:flutter_app_todo_c10_online/providers/auth_provider.dart';
 import 'package:flutter_app_todo_c10_online/providers/list_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -9,8 +10,9 @@ class TaskListTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var listProvider = Provider.of<ListProvider>(context);
+    var authProvider = Provider.of<AuthProviders>(context, listen: false);
     if (listProvider.tasksList.isEmpty) {
-      listProvider.getAllTasksFromFireStore();
+      listProvider.getAllTasksFromFireStore(authProvider.currentUser!.id!);
     }
     return Column(
       children: [
@@ -19,7 +21,8 @@ class TaskListTab extends StatelessWidget {
           firstDate: DateTime.now().subtract(Duration(days: 365)),
           lastDate: DateTime.now().add(Duration(days: 365)),
           onDateSelected: (date) {
-            listProvider.changeSelectedDate(date);
+            listProvider.changeSelectedDate(
+                date, authProvider.currentUser!.id!);
           },
           leftMargin: 20,
           monthColor: MyTheme.blackColor,
